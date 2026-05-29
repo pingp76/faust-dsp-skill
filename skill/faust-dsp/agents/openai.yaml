@@ -1,0 +1,4 @@
+interface:
+  display_name: "Faust DSP"
+  short_description: "Build and test Faust DSP with local runtimes"
+  default_prompt: "Use $faust-dsp to analyze, debug, or run this Faust DSP locally."

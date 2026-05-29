@@ -1,0 +1,10 @@
+[project]
+name = "faust-dsp-skill"
+version = "0.1.0"
+description = "Agent skill for Faust DSP analysis and local runtime management"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
