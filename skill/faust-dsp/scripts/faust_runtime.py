@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import shutil
 import signal
 import socket
@@ -33,6 +34,10 @@ def cache_root() -> Path:
 
 def repo_dir() -> Path:
     return cache_root() / "faust-mcp"
+
+
+def tmp_dir() -> Path:
+    return cache_root() / "tmp"
 
 
 def venv_python() -> Path:
@@ -102,14 +107,68 @@ def python_cmd() -> str:
     return str(py) if py.exists() else sys.executable
 
 
+def faust_include_root() -> Optional[Path]:
+    candidates: list[Path] = []
+    if os.environ.get("FAUST_DSP_FAUST_INCLUDE"):
+        candidates.append(Path(os.environ["FAUST_DSP_FAUST_INCLUDE"]).expanduser())
+    faust = shutil.which("faust")
+    if faust:
+        candidates.append(Path(faust).resolve().parent.parent / "include")
+    candidates.extend([Path("/opt/homebrew/include"), Path("/usr/local/include"), Path("/usr/include")])
+    for root in candidates:
+        if (root / "faust" / "gui" / "MapUI.h").exists():
+            return root
+    return None
+
+
+def real_gpp_path() -> Optional[str]:
+    wrapper_dir = cache_root() / "bin"
+    path = os.environ.get("PATH", "")
+    entries = []
+    for entry in path.split(os.pathsep):
+        if not entry:
+            continue
+        try:
+            if Path(entry).resolve() == wrapper_dir.resolve():
+                continue
+        except OSError:
+            pass
+        entries.append(entry)
+    return shutil.which("g++", path=os.pathsep.join(entries))
+
+
+def ensure_cpp_wrapper() -> Optional[Path]:
+    include_root = faust_include_root()
+    compiler = real_gpp_path()
+    if not include_root or not compiler:
+        return None
+    wrapper_dir = cache_root() / "bin"
+    wrapper_dir.mkdir(parents=True, exist_ok=True)
+    wrapper = wrapper_dir / "g++"
+    content = (
+        "#!/bin/sh\n"
+        f"exec {shlex.quote(compiler)} -I{shlex.quote(str(include_root))} \"$@\"\n"
+    )
+    if not wrapper.exists() or wrapper.read_text(encoding="utf-8") != content:
+        wrapper.write_text(content, encoding="utf-8")
+        wrapper.chmod(0o755)
+    return wrapper_dir
+
+
 def base_env() -> dict[str, str]:
     env = os.environ.copy()
-    env.setdefault("TMPDIR", str(cache_root() / "tmp"))
-    Path(env["TMPDIR"]).mkdir(parents=True, exist_ok=True)
+    tmp_dir().mkdir(parents=True, exist_ok=True)
+    env["TMPDIR"] = str(tmp_dir())
+    path_prefixes: list[str] = []
     py = venv_python()
     if py.exists():
         env["VIRTUAL_ENV"] = str(py.parent.parent)
-        env["PATH"] = str(py.parent) + os.pathsep + env.get("PATH", "")
+        path_prefixes.append(str(py.parent))
+    cpp_wrapper = ensure_cpp_wrapper()
+    if cpp_wrapper:
+        path_prefixes.append(str(cpp_wrapper))
+    if path_prefixes:
+        env["PATH"] = os.pathsep.join(path_prefixes + [env.get("PATH", "")])
     return env
 
 
@@ -154,6 +213,8 @@ def wait_for_port(host: str, port: int, timeout: float = 20.0) -> bool:
 
 
 def runtime_command(kind: str) -> tuple[list[str], Optional[int], dict[str, str]]:
+    if kind not in ("browser", "node", "cpp", "daw"):
+        raise ValueError(f"unknown runtime kind: {kind}")
     env = base_env()
     env["MCP_TRANSPORT"] = "sse"
     env.setdefault("MCP_HOST", "127.0.0.1")
@@ -170,7 +231,7 @@ def runtime_command(kind: str) -> tuple[list[str], Optional[int], dict[str, str]
         return [python_cmd(), "faust_server.py"], int(env["MCP_PORT"]), env
     if kind == "daw":
         return [python_cmd(), "faust_server_daw.py"], int(env["MCP_PORT"]), env
-    raise ValueError(f"unknown runtime kind: {kind}")
+    raise AssertionError(f"unhandled runtime kind: {kind}")
 
 
 def start_runtime(args: argparse.Namespace) -> None:
@@ -263,7 +324,7 @@ def analyze(args: argparse.Namespace) -> None:
         "--dsp",
         resolved_path(args.dsp),
         "--tmpdir",
-        str(cache_root() / "tmp"),
+        str(tmp_dir()),
     ]
     if args.input_source:
         cmd.extend(["--input-source", args.input_source])

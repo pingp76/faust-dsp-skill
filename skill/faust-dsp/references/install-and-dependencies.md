@@ -31,6 +31,18 @@ FAUST_DSP_SKILL_CACHE=/custom/cache python3 scripts/faust_runtime.py ensure
 - Browser audio permission for the browser runtime
 - MIDI device permissions for MIDI workflows
 
+## Launcher-managed local fixes
+
+The launcher creates `~/.cache/faust-dsp-skill/tmp` and passes it as `TMPDIR`
+to upstream servers. Do not ask the user to create this directory manually.
+
+On macOS/Homebrew systems, Faust headers may live under
+`/opt/homebrew/include/faust/...` or `/usr/local/include/faust/...` while the
+upstream offline C++ compile command calls plain `g++`. When those headers are
+detected, the launcher creates a cache-local `bin/g++` wrapper that adds the
+needed include path. This wrapper lives only in the skill cache and is prepended
+to the runtime `PATH`; it does not replace or modify the system compiler.
+
 ## Troubleshooting
 
 Run:

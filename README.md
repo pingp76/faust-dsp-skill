@@ -184,10 +184,11 @@ Use $faust-dsp for a first audio playback test. Create a simple Faust file named
 3. 如果需要真正分析或试听，AI 可能会请求联网下载 `sletz/faust-mcp`。
 4. 它会把下载的 runtime 放到 `~/.cache/faust-dsp-skill/`；在 Codex 里，这一步可能会弹出权限确认，因为它要写入工作区外的本机缓存目录。
 5. 它可能会安装 Python 依赖，第一次要等一会儿。
-6. 如果你要求浏览器试听，它还可能安装 browser UI / Node 相关依赖；这一步像普通软件第一次启动前的准备，可能要等几十秒到几分钟。
-7. 它可能会启动本地网页，例如 `http://127.0.0.1:8010/`。这是你电脑上的本地服务，不是把声音上传到云端。
-8. 它可能会调用 `compile_and_start` 把刚生成的 Faust 音频脚本加载到浏览器 runtime。
-9. 浏览器可能要求你点一下 `Unlock Audio` 或输出开关，这是浏览器的安全限制。
+6. 它可能会在 skill cache 里准备临时目录或本地编译 wrapper，用来适配 Homebrew 安装的 Faust 头文件；这不会修改系统编译器。
+7. 如果你要求浏览器试听，它还可能安装 browser UI / Node 相关依赖；这一步像普通软件第一次启动前的准备，可能要等几十秒到几分钟。
+8. 它可能会启动本地网页，例如 `http://127.0.0.1:8010/`。这是你电脑上的本地服务，不是把声音上传到云端。
+9. 它可能会调用 `compile_and_start` 把刚生成的 Faust 音频脚本加载到浏览器 runtime。
+10. 浏览器可能要求你点一下 `Unlock Audio` 或输出开关，这是浏览器的安全限制。
 
 ### 成功时大概是什么样子
 
