@@ -106,7 +106,17 @@ def base_env() -> dict[str, str]:
     env = os.environ.copy()
     env.setdefault("TMPDIR", str(cache_root() / "tmp"))
     Path(env["TMPDIR"]).mkdir(parents=True, exist_ok=True)
+    py = venv_python()
+    if py.exists():
+        env["VIRTUAL_ENV"] = str(py.parent.parent)
+        env["PATH"] = str(py.parent) + os.pathsep + env.get("PATH", "")
     return env
+
+
+def resolved_path(value: Optional[str]) -> Optional[str]:
+    if not value:
+        return value
+    return str(Path(value).expanduser().resolve())
 
 
 def read_state() -> Optional[dict]:
@@ -251,7 +261,7 @@ def analyze(args: argparse.Namespace) -> None:
         "--tool",
         "compile_and_analyze",
         "--dsp",
-        str(Path(args.dsp).expanduser()),
+        resolved_path(args.dsp),
         "--tmpdir",
         str(cache_root() / "tmp"),
     ]
@@ -260,7 +270,7 @@ def analyze(args: argparse.Namespace) -> None:
     if args.input_freq is not None:
         cmd.extend(["--input-freq", str(args.input_freq)])
     if args.input_file:
-        cmd.extend(["--input-file", args.input_file])
+        cmd.extend(["--input-file", resolved_path(args.input_file)])
     run(cmd, cwd=repo_dir(), env=base_env())
 
 
@@ -270,7 +280,7 @@ def call_tool(args: argparse.Namespace) -> None:
         raise SystemExit("No running runtime. Run: python3 scripts/faust_runtime.py start --kind browser")
     cmd = [python_cmd(), "sse_client_example.py", "--url", state["mcp_url"], "--tool", args.tool]
     if args.dsp:
-        cmd.extend(["--dsp", str(Path(args.dsp).expanduser())])
+        cmd.extend(["--dsp", resolved_path(args.dsp)])
     if args.name:
         cmd.extend(["--name", args.name])
     if args.extra and args.extra[0] == "--":

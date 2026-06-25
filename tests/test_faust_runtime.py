@@ -1,5 +1,7 @@
 from pathlib import Path
 import importlib.util
+import os
+import tempfile
 import unittest
 
 
@@ -49,6 +51,74 @@ class FaustRuntimeTests(unittest.TestCase):
         module = load_module()
         with self.assertRaisesRegex(ValueError, "unknown runtime kind"):
             module.runtime_command("bad")
+
+    def test_base_env_prepends_venv_bin_when_available(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cache = Path(tmpdir)
+            py = cache / "venv" / "bin" / "python"
+            py.parent.mkdir(parents=True)
+            py.touch()
+            old = module.os.environ.get("FAUST_DSP_SKILL_CACHE")
+            try:
+                module.os.environ["FAUST_DSP_SKILL_CACHE"] = str(cache)
+                env = module.base_env()
+                self.assertEqual(env["VIRTUAL_ENV"], str(cache / "venv"))
+                self.assertEqual(env["PATH"].split(os.pathsep)[0], str(py.parent))
+            finally:
+                if old is None:
+                    module.os.environ.pop("FAUST_DSP_SKILL_CACHE", None)
+                else:
+                    module.os.environ["FAUST_DSP_SKILL_CACHE"] = old
+
+    def test_analyze_resolves_relative_dsp_before_switching_to_upstream_cwd(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            cache = root / "cache"
+            work = root / "work"
+            work.mkdir()
+            dsp = work / "tone.dsp"
+            dsp.write_text("process = _;", encoding="utf-8")
+            py = cache / "venv" / "bin" / "python"
+            py.parent.mkdir(parents=True)
+            py.touch()
+
+            captured = {}
+            old_cache = module.os.environ.get("FAUST_DSP_SKILL_CACHE")
+            old_cwd = Path.cwd()
+            try:
+                module.os.environ["FAUST_DSP_SKILL_CACHE"] = str(cache)
+                os.chdir(work)
+                module.ensure_repo = lambda update=False: None
+                module.ensure_venv = lambda: None
+
+                def fake_run(cmd, cwd=None, env=None):
+                    captured["cmd"] = cmd
+                    captured["cwd"] = cwd
+                    captured["env"] = env
+
+                module.run = fake_run
+                args = module.argparse.Namespace(
+                    dsp="tone.dsp",
+                    runtime="cpp",
+                    skip_python_deps=False,
+                    input_source=None,
+                    input_freq=None,
+                    input_file=None,
+                )
+                module.analyze(args)
+            finally:
+                os.chdir(old_cwd)
+                if old_cache is None:
+                    module.os.environ.pop("FAUST_DSP_SKILL_CACHE", None)
+                else:
+                    module.os.environ["FAUST_DSP_SKILL_CACHE"] = old_cache
+
+            self.assertEqual(captured["cwd"], cache / "faust-mcp")
+            self.assertEqual(captured["cmd"][0], str(py))
+            self.assertIn(str(dsp.resolve()), captured["cmd"])
+            self.assertEqual(captured["env"]["PATH"].split(os.pathsep)[0], str(py.parent))
 
 
 if __name__ == "__main__":

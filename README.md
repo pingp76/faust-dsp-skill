@@ -182,7 +182,7 @@ Use $faust-dsp for a first audio playback test. Create a simple Faust file named
 1. 运行 `python3 .../faust_runtime.py doctor`。
 2. 输出一段 JSON，里面可能有 `git`、`python`、`faust`、`g++`、`node` 等字段。
 3. 如果需要真正分析或试听，AI 可能会请求联网下载 `sletz/faust-mcp`。
-4. 它会把下载的 runtime 放到 `~/.cache/faust-dsp-skill/`。
+4. 它会把下载的 runtime 放到 `~/.cache/faust-dsp-skill/`；在 Codex 里，这一步可能会弹出权限确认，因为它要写入工作区外的本机缓存目录。
 5. 它可能会安装 Python 依赖，第一次要等一会儿。
 6. 如果你要求浏览器试听，它还可能安装 browser UI / Node 相关依赖；这一步像普通软件第一次启动前的准备，可能要等几十秒到几分钟。
 7. 它可能会启动本地网页，例如 `http://127.0.0.1:8010/`。这是你电脑上的本地服务，不是把声音上传到云端。
