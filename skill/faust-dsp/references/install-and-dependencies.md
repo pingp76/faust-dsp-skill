@@ -23,6 +23,21 @@ FAUST_DSP_SKILL_CACHE=/custom/cache python3 scripts/faust_runtime.py ensure
 - `g++`
 - Python packages from upstream `requirements.txt`
 
+## Platform Status
+
+Treat this skill as macOS-first. The Codex install flow, Homebrew guidance, and
+browser playback smoke test have been exercised on macOS.
+
+Linux is not intentionally excluded, but it is less tested. It should be
+possible when `git`, Python 3, `faust`, `g++`, Node.js, and npm are available in
+`PATH`; use the distribution's package manager rather than Homebrew unless the
+user explicitly has Homebrew on Linux.
+
+Native Windows is not currently a recommended target. The launcher assumes a
+Unix-like environment in several places, including `venv/bin/python`, `g++`,
+process-group cleanup, executable permission bits, and shell wrappers. Prefer
+WSL for Windows users.
+
 ## Optional
 
 - DawDreamer for `analyze --runtime daw`

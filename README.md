@@ -78,6 +78,14 @@ flowchart LR
 
 你不一定要手动安装。更推荐的体验是：先让 Codex 检查；如果缺少 `faust`，Codex 会解释要安装什么，并在你批准后运行安装命令。
 
+### 平台支持状态
+
+目前这个项目是 **macOS-first**：安装说明、Homebrew 自动安装提示、浏览器试听流程都已经在 macOS 上实测过。
+
+它不是理论上只能在 macOS 上工作。Linux 只要能提供 `git`、Python 3、`faust`、`g++`、Node.js/npm，也应该可以跑基础离线分析和 runtime，但还没有像 macOS 一样完整实测。Linux 用户应该让 AI 按自己的发行版包管理器安装 Faust CLI，而不是运行 Homebrew 命令。
+
+Windows 原生环境目前不建议作为第一选择。当前 launcher 假设类 Unix 环境，例如 `venv/bin/python`、`g++`、进程组清理和 shell wrapper。Windows 用户更适合先尝试 WSL。
+
 如果你是 macOS 用户，最常见的安装方式是 Homebrew：
 
 ```bash
@@ -96,7 +104,7 @@ https://github.com/pingp76/faust-dsp-skill/tree/main/skill/faust-dsp
 1. 优先使用 Codex 的 skill-installer；如果不可用，就用 git clone + 复制目录的方式安装。
 2. 安装到本机 Codex skills 目录，也就是 $CODEX_HOME/skills；如果 CODEX_HOME 没有设置，就安装到 ~/.codex/skills。
 3. 安装后请直接运行刚安装目录里的 scripts/faust_runtime.py doctor，告诉我 git、python、faust、g++、node 哪些已经可用，哪些还缺。
-4. 如果 faust 缺失，并且我是 macOS 且 Homebrew 可用，请先说明 brew install faust 会做什么、可能要等多久，然后请求我批准后再运行。安装完成后运行 faust --version 和 doctor 验证。
+4. 如果 faust 缺失，并且我是 macOS 且 Homebrew 可用，请先说明 brew install faust 会做什么、可能要等多久，然后请求我批准后再运行。如果不是 macOS，不要运行 brew；请说明当前平台还没有完整实测，并给出最保守的下一步。
 5. 不要假装当前对话已经能直接使用 $faust-dsp。安装完成后提醒我重启 Codex，或者打开一个新对话，再进行第一次运行验证。
 ```
 
