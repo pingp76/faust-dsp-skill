@@ -1,5 +1,7 @@
 # Faust DSP Skill
 
+语言：中文 | [English](README.en.md)
+
 让 Codex、Claude Code 或其他支持 skill 的 AI agent 帮你写、检查、试听和调试
 [Faust](https://faust.grame.fr/) DSP 音频程序。
 
