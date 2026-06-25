@@ -164,16 +164,16 @@ Use $faust-dsp. This is my first run. Run doctor, explain what each line means, 
 如果你希望第一次验证就“生成一个简单音频脚本，并在浏览器里播放”，可以输入：
 
 ```text
-Use $faust-dsp for a first audio playback test. Create a simple Faust file named first_tone.dsp that plays a safe low-volume sine tone. Run doctor, analyze it offline, then start the browser runtime, compile_and_start the DSP, open the reported local browser URL, and help me confirm it is not silent with get_audio_metrics. If the browser asks for Unlock Audio, tell me to click it. Stop the runtime after I say I am done listening.
+Use $faust-dsp for a first audio playback test. Create a simple Faust file named first_tone.dsp that plays a safe low-volume sine tone. Run doctor first. If faust is missing, do not install it automatically and do not start the browser runtime; tell me the simplest install command and stop. If faust is available, analyze the DSP offline, then start the browser runtime, compile_and_start the DSP, open the reported local browser URL, and help me confirm it is not silent with get_audio_metrics. If the browser asks for Unlock Audio, tell me to click it. Stop the runtime after I say I am done listening.
 ```
 
 中文也可以这样说：
 
 ```text
-用 $faust-dsp 做第一次浏览器试听验证：生成一个安全音量的 first_tone.dsp 简单音频脚本，先离线分析确认不是静音，然后启动浏览器试听 runtime，自动打开本地浏览器页面播放。浏览器如果要求 Unlock Audio，提醒我点击。等我说听完后，再关闭 runtime。
+用 $faust-dsp 做第一次浏览器试听验证：生成一个安全音量的 first_tone.dsp 简单音频脚本。先运行 doctor，如果 faust 缺失，不要自动安装，也不要启动浏览器 runtime；告诉我最简单的安装命令后停下来。如果 faust 可用，先离线分析确认不是静音，然后启动浏览器试听 runtime，自动打开本地浏览器页面播放。浏览器如果要求 Unlock Audio，提醒我点击。等我说听完后，再关闭 runtime。
 ```
 
-你应该看到 AI 先生成一个很短的 Faust `.dsp` 文件，再启动本地浏览器页面。如果你的 AI 工具支持自动打开浏览器，页面会弹出或切换到类似 `http://127.0.0.1:8010/` 的地址；如果不支持，它会把这个地址发给你手动打开。第一次听不到声音时，先看页面上是否有 `Unlock Audio`、输出开关或浏览器音频权限提示。
+你应该看到 AI 先生成一个很短的 Faust `.dsp` 文件，并确认本机有 `faust` 命令。只有离线分析成功后，它才应该启动本地浏览器页面。如果你的 AI 工具支持自动打开浏览器，页面会弹出或切换到类似 `http://127.0.0.1:8010/` 的地址；如果不支持，它会把这个地址发给你手动打开。第一次听不到声音时，先看页面上是否有 `Unlock Audio`、输出开关或浏览器音频权限提示。
 
 ### 第一次运行时你可能会看到什么
 
