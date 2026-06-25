@@ -70,6 +70,35 @@ flowchart LR
 
 ## 安装：Codex 推荐流程
 
+最省心的方式是：让 Codex 自己帮你安装。
+
+打开一个新的 Codex 对话，复制下面这段话：
+
+```text
+请帮我安装 Faust DSP Skill：
+https://github.com/pingp76/faust-dsp-skill/tree/main/skill/faust-dsp
+
+要求：
+1. 优先使用 Codex 的 skill-installer；如果不可用，就用 git clone + 复制目录的方式安装。
+2. 安装到本机 Codex skills 目录，也就是 $CODEX_HOME/skills；如果 CODEX_HOME 没有设置，就安装到 ~/.codex/skills。
+3. 安装后请直接运行刚安装目录里的 scripts/faust_runtime.py doctor，告诉我 git、python、faust、g++、node 哪些已经可用，哪些还缺。
+4. 不要假装当前对话已经能直接使用 $faust-dsp。安装完成后提醒我重启 Codex，或者打开一个新对话，再进行第一次运行验证。
+```
+
+你需要做的通常只有三件事：
+
+1. 把上面这段话发给 Codex。
+2. Codex 请求运行终端命令时，确认这些命令是在下载/复制这个 skill。
+3. 安装完成后重启 Codex，或打开一个新对话。
+
+重启后，Codex 才会重新扫描 skills。之后你就可以在对话里使用：
+
+```text
+$faust-dsp
+```
+
+下面的终端命令是备用安装方式，适合想手动操作或排查问题的人。
+
 ### 1. 下载这个项目
 
 打开终端，运行：
