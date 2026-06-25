@@ -72,6 +72,20 @@ flowchart LR
 
 最省心的方式是：让 Codex 自己帮你安装。
 
+### 安装前先知道：需要 Faust CLI
+
+这个 skill 可以帮你自动下载和启动底层 runtime，但真正编译 Faust DSP 时，电脑上仍然需要有 `faust` 命令。
+
+你不一定要手动安装。更推荐的体验是：先让 Codex 检查；如果缺少 `faust`，Codex 会解释要安装什么，并在你批准后运行安装命令。
+
+如果你是 macOS 用户，最常见的安装方式是 Homebrew：
+
+```bash
+brew install faust
+```
+
+这一步可能会花几分钟，尤其是 Homebrew 需要先更新自己时。它是系统级软件安装，所以不应该静默自动执行。
+
 打开一个新的 Codex 对话，复制下面这段话：
 
 ```text
@@ -82,13 +96,14 @@ https://github.com/pingp76/faust-dsp-skill/tree/main/skill/faust-dsp
 1. 优先使用 Codex 的 skill-installer；如果不可用，就用 git clone + 复制目录的方式安装。
 2. 安装到本机 Codex skills 目录，也就是 $CODEX_HOME/skills；如果 CODEX_HOME 没有设置，就安装到 ~/.codex/skills。
 3. 安装后请直接运行刚安装目录里的 scripts/faust_runtime.py doctor，告诉我 git、python、faust、g++、node 哪些已经可用，哪些还缺。
-4. 不要假装当前对话已经能直接使用 $faust-dsp。安装完成后提醒我重启 Codex，或者打开一个新对话，再进行第一次运行验证。
+4. 如果 faust 缺失，并且我是 macOS 且 Homebrew 可用，请先说明 brew install faust 会做什么、可能要等多久，然后请求我批准后再运行。安装完成后运行 faust --version 和 doctor 验证。
+5. 不要假装当前对话已经能直接使用 $faust-dsp。安装完成后提醒我重启 Codex，或者打开一个新对话，再进行第一次运行验证。
 ```
 
 你需要做的通常只有三件事：
 
 1. 把上面这段话发给 Codex。
-2. Codex 请求运行终端命令时，确认这些命令是在下载/复制这个 skill。
+2. Codex 请求运行终端命令时，确认这些命令是在下载/复制这个 skill，或是在你同意后安装 Faust CLI。
 3. 安装完成后重启 Codex，或打开一个新对话。
 
 重启后，Codex 才会重新扫描 skills。之后你就可以在对话里使用：
